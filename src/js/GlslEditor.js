@@ -28,17 +28,17 @@ const EMPTY_FRAG_SHADER = `// Author:
 precision mediump float;
 #endif
 
-uniform vec2 u_resolution;
-uniform vec2 u_mouse;
-uniform float u_time;
+uniform vec2 iResolution;
+uniform vec2 iMouse;
+uniform float iGlobalTime;
 
 void main() {
-    vec2 st = gl_FragCoord.xy/u_resolution.xy;
-    st.x *= u_resolution.x/u_resolution.y;
+    vec2 st = gl_FragCoord.xy/iResolution.xy;
+    st.x *= iResolution.x/iResolution.y;
 
     st += vec2(.0);
     vec3 color = vec3(1.);
-    color = vec3(st.x,st.y,abs(sin(u_time)));
+    color = vec3(st.x,st.y,abs(sin(iGlobalTime)));
 
     gl_FragColor = vec4(color,1.0);
 }`;

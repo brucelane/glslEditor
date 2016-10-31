@@ -15626,9 +15626,9 @@ var GlslCanvas = (function () {
 
             this.animated = false;
             this.nDelta = (this.fragmentString.match(/u_delta/g) || []).length;
-            this.nTime = (this.fragmentString.match(/u_time/g) || []).length;
-            this.nDate = (this.fragmentString.match(/u_date/g) || []).length;
-            this.nMouse = (this.fragmentString.match(/u_mouse/g) || []).length;
+            this.nTime = (this.fragmentString.match(/iGlobalTime/g) || []).length;
+            this.nDate = (this.fragmentString.match(/iDate/g) || []).length;
+            this.nMouse = (this.fragmentString.match(/iMouse/g) || []).length;
             this.animated = this.nDate > 1 || this.nTime > 1 || this.nMouse > 1;
 
             var nTextures = this.fragmentString.search(/sampler2D/g);
@@ -15750,7 +15750,7 @@ var GlslCanvas = (function () {
             // set the mouse uniform
             var rect = this.canvas.getBoundingClientRect();
             if (mouse && mouse.x && mouse.x >= rect.left && mouse.x <= rect.right && mouse.y && mouse.y >= rect.top && mouse.y <= rect.bottom) {
-                this.uniform('2f', 'vec2', 'u_mouse', mouse.x - rect.left, this.canvas.height - (mouse.y - rect.top));
+                this.uniform('2f', 'vec2', 'iMouse', mouse.x - rect.left, this.canvas.height - (mouse.y - rect.top));
             }
         }
 
@@ -15826,22 +15826,22 @@ var GlslCanvas = (function () {
                 var date = new Date();
                 var now = date.getTime();
                 if (this.nDelta > 1) {
-                    this.uniform('1f', 'float', 'u_time', (now - this.timePrev) / 1000.0);
+                    this.uniform('1f', 'float', 'iGlobalTime', (now - this.timePrev) / 1000.0);
                     this.timePrev = now;
                 }
 
                 if (this.nTime > 1) {
                     // set the time uniform
-                    this.uniform('1f', 'float', 'u_time', (now - this.timeLoad) / 1000.0);
+                    this.uniform('1f', 'float', 'iGlobalTime', (now - this.timeLoad) / 1000.0);
                 }
 
                 if (this.nDate) {
                     // Set date uniform: year/month/day/time_in_sec
-                    this.uniform('4f', 'float', 'u_date', date.getFullYear(), date.getMonth(), date.getDate(), date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds() + date.getMilliseconds() * 0.001);
+                    this.uniform('4f', 'float', 'iDate', date.getFullYear(), date.getMonth(), date.getDate(), date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds() + date.getMilliseconds() * 0.001);
                 }
 
                 // set the resolution uniform
-                this.uniform('2f', 'vec2', 'u_resolution', this.canvas.width, this.canvas.height);
+                this.uniform('2f', 'vec2', 'iResolution', this.canvas.width, this.canvas.height);
 
                 this.texureIndex = 0;
                 for (var tex in this.textures) {
@@ -17122,7 +17122,7 @@ var _vendorFileSaverMinJs = _dereq_('./vendor/FileSaver.min.js');
 
 var STORAGE_LAST_EDITOR_CONTENT = 'last-content';
 
-var EMPTY_FRAG_SHADER = '// Author: \n// Title: \n\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nuniform vec2 u_resolution;\nuniform vec2 u_mouse;\nuniform float u_time;\n\nvoid main() {\n    vec2 st = gl_FragCoord.xy/u_resolution.xy;\n    st.x *= u_resolution.x/u_resolution.y;\n\n    st += vec2(.0);\n    vec3 color = vec3(1.);\n    color = vec3(st.x,st.y,abs(sin(u_time)));\n\n    gl_FragColor = vec4(color,1.0);\n}';
+var EMPTY_FRAG_SHADER = '// Author: \n// Title: \n\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nuniform vec2 iResolution;\nuniform vec2 iMouse;\nuniform float iGlobalTime;\n\nvoid main() {\n    vec2 st = gl_FragCoord.xy/iResolution.xy;\n    st.x *= iResolution.x/iResolution.y;\n\n    st += vec2(.0);\n    vec3 color = vec3(1.);\n    color = vec3(st.x,st.y,abs(sin(iGlobalTime)));\n\n    gl_FragColor = vec4(color,1.0);\n}';
 
 var GlslEditor = (function () {
     function GlslEditor(selector, options) {
